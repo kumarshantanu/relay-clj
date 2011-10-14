@@ -29,25 +29,33 @@
   (Executors/newSingleThreadExecutor))
 
 
+(def ^{:doc "Unbounded thread pool"}
+      unbounded-thread-pool (cached-thread-pool))
+
+
 (defn ^GenericDaemon make-daemon
   "Return an unstarted daemon that when started, will asynchronously execute the
   function `f` (which takes daemon object as argument) endlessly in a loop until
   either change of state is requested e.g. SUSPEND, RESUME, STOP, or `f` throws
   an exception.
   Optional arguments:
-    idle-millis   (Long)     no. of milliseconds to sleep in the loop when idle
-    thread-pool   (ExecutorService) a thread pool used to execute jobs
-    parallel-jobs (Integer)  no. of jobs to run in parallel using `thread-pool`
-    args-maker    (1-arg function) returns a sequence of args to be applied to `f`
-    collector     (2-arg function) for post-processing action with result
+    idle-millis   (Long)            no. of millis to sleep in the loop when idle
+    thread-pool   (ExecutorService) a thread pool used to execute jobs;
+                                    default: `unbounded-thread-pool`
+    parallel-jobs (Integer)         no. of jobs to run in parallel using
+                                    `thread-pool`; default: 1
+    args-maker    (1-arg function)  returns a seq of args to be applied to `f`
+    collector     (2-arg function)  for post-processing action with result of f
   Notes:
     1. `args-maker` and `collector` are called on a FIFO basis for each call of
        `f` - if a function completes earlier than the one before it, it waits in
-       an internal queue for its turn."
+       an internal queue for its turn.
+    2. In most cases you may want to use `parallel jobs` argument to control the
+       degree of parallelism. `thread-pool` may be used for strategy/policy."
   [daemon-name f & {:keys [idle-millis ^ExecutorService thread-pool
                            ^int parallel-jobs args-maker collector]
                     :or {idle-millis    2000
-                         thread-pool    (single-thread-pool)
+                         thread-pool    unbounded-thread-pool
                          parallel-jobs  1
                          args-maker     (fn [daemon] (seq [daemon]))
                          collector      (fn [daemon result] nil)}
@@ -57,12 +65,14 @@
 
 
 (defn start!
-  "Start an daemon using an executor service. The return value can be deref'ed
+  "Start `daemon` using an executor service. The return value can be deref'ed
   (as boolean) to find out whether the daemon is terminated."
-  [^GenericDaemon daemon ^ExecutorService pool]
-  (let [f (.submit pool daemon)]
-    (reify IDeref
-      (deref [this] (.isDone ^Future f)))))
+  ([^GenericDaemon daemon]
+    (start! daemon unbounded-thread-pool))
+  ([^GenericDaemon daemon ^ExecutorService pool]
+    (let [f (.submit pool daemon)]
+      (reify IDeref
+        (deref [this] (.isDone ^Future f))))))
 
 
 (defn suspend!
