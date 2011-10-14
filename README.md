@@ -26,7 +26,7 @@ concurrent `queues`, typically to work in a producer-consumer fashion.
 `args-maker-inbox` creates an args-maker function to read from an inbox queue.
 
 `wrap-args-maker-max-size` wraps an args-maker function to honor max-size of a
-collection (typically an outbox queue, so as not to overload it eventually.)
+collection (typically an outbox queue, so as not to overload it.)
 
 `collector-outbox` creates a collector function to write to an outbox queue.
 
@@ -58,7 +58,7 @@ Note: FORCE_STOPPED gets automatically transitioned to STOPPED state on effect.
 ## License
 
 Copyright (C) 2011 Shantanu Kumar
-([mailto:kumar.shantanu@gmail.com](kumar.shantanu@gmail.com) and
-[http://twitter.com/#!/kumarshantanu](@kumarshantanu))
+([kumar.shantanu@gmail.com](mailto:kumar.shantanu@gmail.com) and
+[@kumarshantanu](http://twitter.com/#!/kumarshantanu))
 
 Distributed under the Eclipse Public License, the same as Clojure.
