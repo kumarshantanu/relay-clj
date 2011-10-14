@@ -3,9 +3,6 @@
   (:use [relay.core])
   (:use [clojure.test]))
 
-(def daemon-runner (cached-thread-pool))
-
-
 (defn pause "Pause for some time" ([] (sleep 700)) ([n] (sleep n)))
 (defn long-pause "Pause for a little longer" [] (sleep 2000))
 
@@ -27,7 +24,7 @@
       (is (= r (.getState d)) READY))
     (testing
       "=== Running daemon, suspending/resuming/stopping it ==="
-      (let [done? (start! d daemon-runner)]
+      (let [done? (start! d)]
         (is (= DaemonState$DaemonStateEnum/RUNNING (.getState d)))
         (is (not @done?))
         (suspend! d)
@@ -44,7 +41,7 @@
         (is @done?)))
     (testing
       "=== Running daemon and force-stopping it ==="
-      (let [done? (start! d daemon-runner)]
+      (let [done? (start! d)]
         (is (= DaemonState$DaemonStateEnum/RUNNING (.getState d))
             "Daemon should be in RUNNING state")
         (is (not @done?) "Daemon should NOT be done")
@@ -59,14 +56,14 @@
 
 (deftest test-make-daemon-parallel-jobs
   (let [npar 5
-        pool (fixed-thread-pool npar)
+        pool (make-fixed-thread-pool npar)
         d (make-daemon "parallel-jobs-daemon"
                        (fn [x] (println "Hello world in daemon" x))
                        :thread-pool pool
                        :parallel-jobs npar)]
     (testing
       "=== Daemon with parallel jobs ==="
-      (let [done? (start! d daemon-runner)]
+      (let [done? (start! d)]
         (is (= DaemonState$DaemonStateEnum/RUNNING (.getState d))
             "Daemon should be in RUNNING state")
         (is (not @done?) "Daemon should NOT be done")
@@ -99,9 +96,9 @@
                         :args-maker (wrap-args-maker-max-size
                                       (args-maker-inbox q2) q2)
                         :collector (fn [d r] (swap! output-2 #(conj % r))))
-        c1 (start! d1 daemon-runner)
-        c2 (start! d2 daemon-runner)
-        c3 (start! d3 daemon-runner)]
+        c1 (start! d1)
+        c2 (start! d2)
+        c3 (start! d3)]
     (testing
       "=== Daemons running a pipeline ==="
       (is (= DaemonState$DaemonStateEnum/RUNNING (.getState d1))

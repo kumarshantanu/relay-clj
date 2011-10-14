@@ -8,21 +8,21 @@
            (relay                GenericDaemon TimerUtil)))
 
 
-(defn ^ExecutorService cached-thread-pool
+(defn ^ExecutorService make-cached-thread-pool
   "Returns a thread pool that creates new threads as needed, but will reuse
   previously constructed threads when they are available."
   []
   (Executors/newCachedThreadPool))
 
 
-(defn ^ExecutorService fixed-thread-pool
+(defn ^ExecutorService make-fixed-thread-pool
   "Returns a thread pool that reuses a fixed number of threads operating off a
   shared unbounded queue."
   [n]
   (Executors/newFixedThreadPool n))
 
 
-(defn ^ExecutorService single-thread-pool
+(defn ^ExecutorService make-single-thread-pool
   "Returns a thread pool that creates an Executor that uses a single worker
   thread operating off an unbounded queue."
   []
@@ -30,7 +30,7 @@
 
 
 (def ^{:doc "Unbounded thread pool"}
-      unbounded-thread-pool (cached-thread-pool))
+      unbounded-thread-pool (make-cached-thread-pool))
 
 
 (defn ^GenericDaemon make-daemon
