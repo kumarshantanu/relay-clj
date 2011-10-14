@@ -12,9 +12,8 @@ concurrent `queues`, typically to work in a producer-consumer fashion.
   functions that are guaranteed to run in a FIFO order together. These functions
   can be used to read from and write to queues.
 * This library creates in-JVM queues only; for remote queues you can use an
-  external provider (e.g. RabbitMQ, HornetQ, Beanstalkd etc.) and have the queue
-  wrapped in java.util.concurrent.BlockingQueue (preferred) or java.util.Queue -
-  the daemons will work similarly as with in-JVM queues.
+  external provider (e.g. RabbitMQ, HornetQ, Beanstalkd etc.) and tie their
+  access into `args-maker` and `collector` functions.
 
 
 ## Usage
