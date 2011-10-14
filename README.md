@@ -19,9 +19,15 @@ concurrent `queues`, typically to work in a producer-consumer fashion.
 
 ## Usage
 
+Refer to the `relay.core` namespace as appropriate:
+
+    (ns foo.bar
+      (:require [relay.core :as relay]))
+
+
 `make-daemon` creates a daemon, which is initially in READY state.
 
-`make-queue` creates an in-JVM queue.
+`make-queue` creates an in-JVM concurrent queue.
 
 `args-maker-inbox` creates an args-maker function to read from an inbox queue.
 
@@ -30,8 +36,9 @@ collection (typically an outbox queue, so as not to overload it.)
 
 `collector-outbox` creates a collector function to write to an outbox queue.
 
-`cached-thread-pool`, `fixed-thread-pool` and `single-thread-pool` create thread
-pools.
+`make-cached-thread-pool`, `make-fixed-thread-pool` and `make-single-thread-pool`
+create thread pools. `unbounded-thread-pool` is a var bound to a thread pool
+created using `make-cached-thread-pool`, which is the global default.
 
 `start!`, `suspend!`, `resume!`, `stop!` and `force-stop!` change the state of
 the daemon. Request is ignored if it is not possible to change the state, e.g.
